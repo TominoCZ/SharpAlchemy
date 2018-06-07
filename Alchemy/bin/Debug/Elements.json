@@ -1,0 +1,111 @@
+{
+  "Elements": [
+    {
+      "Name": "Water",
+      "TextureName": "water",
+      "IsBaseElement": true
+    },
+    {
+      "Name": "Fire",
+      "TextureName": "fire",
+      "IsBaseElement": true
+    },
+    {
+      "Name": "Air",
+      "TextureName": "air",
+      "IsBaseElement": true
+    },
+    {
+      "Name": "Earth",
+      "TextureName": "earth",
+      "IsBaseElement": true
+    },
+    {
+      "Name": "Steam",
+      "TextureName": "steam",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Mud",
+      "TextureName": "mud",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Dust",
+      "TextureName": "dust",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Sand",
+      "TextureName": "sand",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Glass",
+      "TextureName": "glass",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Obsidian",
+      "TextureName": "obsidian",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Lava",
+      "TextureName": "lava",
+      "IsBaseElement": false
+    }
+  ],
+  "ElementCombinations": [
+    {
+      "Element1": "Fire",
+      "Element2": "Earth",
+      "Products": [
+        "Lava"
+      ]
+    },
+    {
+      "Element1": "Fire",
+      "Element2": "Sand",
+      "Products": [
+        "Glass"
+      ]
+    },
+    {
+      "Element1": "Fire",
+      "Element2": "Water",
+      "Products": [
+        "Steam",
+        "Steam"
+      ]
+    },
+    {
+      "Element1": "Water",
+      "Element2": "Earth",
+      "Products": [
+        "Mud"
+      ]
+    },
+    {
+      "Element1": "Water",
+      "Element2": "Lava",
+      "Products": [
+        "Obsidian"
+      ]
+    },
+    {
+      "Element1": "Earth",
+      "Element2": "Air",
+      "Products": [
+        "Dust"
+      ]
+    },
+    {
+      "Element1": "Dust",
+      "Element2": "Dust",
+      "Products": [
+        "Sand"
+      ]
+    }
+  ]
+}

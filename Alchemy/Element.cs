@@ -2,18 +2,17 @@
 {
     public class Element
     {
-        public static Element Fire;
-        public static Element Water;
-        public static Element Earth;
-        public static Element Air;
-
         private readonly string _displayName;
         public int TextureId { get; }
+        public bool IsBaseElement { get; }
 
-        public Element(string displayName, string textureName)
+        public Element(string displayName, string textureName, bool isBaseElement = false)
         {
             _displayName = displayName;
+
             TextureId = TextureManager.GetOrRegister(textureName);
+
+            IsBaseElement = isBaseElement;
         }
 
         public override string ToString()

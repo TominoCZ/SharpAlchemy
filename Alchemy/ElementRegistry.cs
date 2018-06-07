@@ -11,6 +11,12 @@ namespace Alchemy
 
         private static readonly List<Element> AllElements = new List<Element>();
 
+        public static void RegisterElement(Element e)
+        {
+            if (!AllElements.Contains(e))
+                AllElements.Add(e);
+        }
+
         public static void RegisterCombination(Element e1, Element e2, params Element[] products)
         {
             if (CombinationExists(e1, e2))
@@ -24,6 +30,11 @@ namespace Alchemy
                 AllElements.Add(e2);
 
             Combinations.TryAdd(combination, products);
+        }
+
+        public static Element[] GetBaseElements()
+        {
+            return AllElements.Where(e => e.IsBaseElement).ToArray();
         }
 
         public static Element[] GetProducts(Element e1, Element e2)
