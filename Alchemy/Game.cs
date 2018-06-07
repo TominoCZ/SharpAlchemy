@@ -150,20 +150,27 @@ namespace Alchemy
                     GL.Translate(-entity.X, -entity.Y, 0);
                 }
 
-                entity.Render();
+                entity.Render(partialTicks);
             }
 
             if (_toastQueue.Count > 0)
-                _toastQueue.Last()?.Render(partialTicks);
+                _toastQueue.First()?.Render(partialTicks);
 
             SwapBuffers();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            for (var index = _elementEntities.Count - 1; index >= 0; index--)
+            {
+                var entity = _elementEntities[index];
+
+                entity.Update();
+            }
+
             if (_toastQueue.Count > 0)
             {
-                var toast = _toastQueue.Last();
+                var toast = _toastQueue.First();
                 if (toast != null)
                 {
                     toast.Update();
@@ -314,7 +321,7 @@ namespace Alchemy
         }
     }
 
-    class AchievementToast
+    internal class AchievementToast
     {
         public string Title;
         public string MessageText;
@@ -373,7 +380,7 @@ namespace Alchemy
 
             //render toast texture
             GL.BindTexture(TextureTarget.Texture2D, _toastTextureID);
-            
+
             GL.Color4(1f, 1, 1, 1);
             GL.Scale(256, 64, 1);
             GL.Begin(PrimitiveType.Quads);
@@ -383,7 +390,7 @@ namespace Alchemy
 
             //render icon shadow
             GL.BindTexture(TextureTarget.Texture2D, _iconTextureID);
-            
+
             GL.Color4(0f, 0, 0, 1);
             GL.Translate(-94.5F, 2, 0);
             GL.Scale(49, 49, 1);

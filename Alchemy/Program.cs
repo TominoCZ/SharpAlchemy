@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Alchemy.Properties;
+using System;
 using System.Windows.Forms;
-using Alchemy.Properties;
 
 namespace Alchemy
 {

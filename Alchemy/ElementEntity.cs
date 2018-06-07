@@ -1,6 +1,6 @@
-﻿using System;
+﻿using OpenTK.Graphics.OpenGL;
+using System;
 using System.Drawing;
-using OpenTK.Graphics.OpenGL;
 
 namespace Alchemy
 {
@@ -12,6 +12,11 @@ namespace Alchemy
 
         public static int ElementIconSize = 64;
 
+        private int _ticks;
+        private int _ticksLast;
+
+        private readonly int _maxTicks = 3;
+
         public ElementEntity(float x, float y, Element element)
         {
             X = x;
@@ -20,15 +25,26 @@ namespace Alchemy
             Element = element;
         }
 
-        public void Render()
+        public void Update()
         {
+            _ticksLast = _ticks;
+
+            if (_ticks < _maxTicks)
+                _ticks++;
+        }
+
+        public void Render(float partialTicks)
+        {
+            var partialTick = _ticksLast + (_ticks - _ticksLast) * partialTicks;
+            var progress = Math.Min(partialTick, _maxTicks) / _maxTicks;
+
             GL.Translate(X, Y, 0);
             GL.Scale(ElementIconSize, ElementIconSize, 1);
 
             GL.BindTexture(TextureTarget.Texture2D, Element.TextureID);
 
             GL.Begin(PrimitiveType.Quads);
-            GL.Color3(1f, 1, 1);
+            GL.Color4(1f, 1, 1, progress);
             VertexUtil.PutQuad();
             GL.End();
 
