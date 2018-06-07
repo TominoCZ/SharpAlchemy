@@ -35,7 +35,21 @@ namespace Alchemy
             GenerateFontImage();
         }
 
-        public static void DrawText(float x, float y, string text)
+        public static void DrawTextWithShadow(float x, float y, string text)
+        {
+            float[] color = new float[4];
+            GL.GetFloat(GetPName.CurrentColor, color);
+
+            GL.Color3(0, 0, 0);
+            GL.Translate(2, 2, 0);
+            DrawText(x, y, text);
+            GL.Translate(-2, -2, 0);
+
+            GL.Color4(color[0], color[1], color[2], 1);
+            DrawText(x, y, text);
+        }
+
+        private static void DrawText(float x, float y, string text)
         {
             var tex = TextureManager.GetOrRegister("font");
 
@@ -71,7 +85,7 @@ namespace Alchemy
         {
             var size = TextRenderer.MeasureText(text, _font);
 
-            DrawText(x - size.Width / 2 + _charXSpacing / 2, y - size.Height / 2, text);
+            DrawTextWithShadow(x - size.Width / 2 + _charXSpacing / 2, y - size.Height / 2, text);
         }
 
         private static void GenerateFontImage()
