@@ -14,7 +14,6 @@ namespace Alchemy
     public class Game : GameWindow
     {
         private readonly List<AchievementToast> _toastQueue = new List<AchievementToast>();
-
         private readonly List<ElementEntity> _elementEntities = new List<ElementEntity>();
         private readonly List<Element> _learntElements = new List<Element>();
 
@@ -23,7 +22,6 @@ namespace Alchemy
         private ElementEntity _holding;
         private ElementEntity _lastClicked;
         private PointF _clickOffset;
-        private Point _mouseLast;
 
         private readonly Timer _doubleClickTimer;
         private int _clicks;
@@ -60,8 +58,10 @@ namespace Alchemy
 
             RegisterElementCombinations();
 
-            LearnElement(Element.Fire);
-            LearnElement(Element.Water);
+            _learntElements.Add(Element.Fire);
+            _learntElements.Add(Element.Water);
+            _learntElements.Add(Element.Air);
+            _learntElements.Add(Element.Earth);
 
             AddBaseElements(new Point(Width / 2, Height / 2));
         }
@@ -71,17 +71,37 @@ namespace Alchemy
             Element.Fire = new Element("Fire", "fire");
             Element.Water = new Element("Water", "water");
 
-            var steam = new Element("Steam", "steam");
+            Element.Air = new Element("Air", "air");
+            Element.Earth = new Element("Earth", "earth");
 
+            var steam = new Element("Steam", "steam");
+            var lava = new Element("Lava", "lava");
+            var mud = new Element("Mud", "mud");
+            var obsidian = new Element("Obsidian", "obsidian");
+            var dust = new Element("Dust", "dust");
+            var sand = new Element("Sand", "sand");
+            var glass = new Element("Glass", "glass");
+            
+            ElementRegistry.RegisterCombination(Element.Fire, sand, glass);
             ElementRegistry.RegisterCombination(Element.Fire, Element.Water, steam, steam);
+            ElementRegistry.RegisterCombination(Element.Fire, Element.Earth, lava);
+            ElementRegistry.RegisterCombination(Element.Earth, Element.Water, mud);
+            ElementRegistry.RegisterCombination(Element.Earth, Element.Air, dust);
+            ElementRegistry.RegisterCombination(Element.Water, lava, obsidian);
+            ElementRegistry.RegisterCombination(dust, dust, sand);
 
             //TODO - call an event
         }
 
         private void AddBaseElements(Point p = new Point())
         {
-            SpawnElementEntity(p.X - ElementEntity.ElementIconSize / 1.75f, p.Y, Element.Water);
-            SpawnElementEntity(p.X + ElementEntity.ElementIconSize / 1.75f, p.Y, Element.Fire);
+            var offset = ElementEntity.ElementIconSize / 1.5f;
+
+            SpawnElementEntity(p.X - offset, p.Y - offset, Element.Water);
+            SpawnElementEntity(p.X + offset, p.Y - offset, Element.Fire);
+
+            SpawnElementEntity(p.X - offset, p.Y + offset, Element.Earth);
+            SpawnElementEntity(p.X + offset, p.Y + offset, Element.Air);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -90,67 +110,11 @@ namespace Alchemy
 
             var partialTicks = (float)(_updateTimer.Elapsed.TotalMilliseconds / (TargetUpdatePeriod * 1000f));
 
-            ElementEntity over = GetTopElementAtPoint(_mouseLast);
-            ElementEntity overOther = null;
-
-            if (over != null)
-                overOther = GetTopElementAtPoint(new PointF(over.X, over.Y), over);
-
             for (var index = 0; index < _elementEntities.Count; index++)
             {
                 var entity = _elementEntities[index];
 
-                if (entity == null)
-                    continue;
-
-                var isOtherEntity = overOther == entity;
-
-                if (over == entity || isOtherEntity && _holding != null)
-                {
-                    var canCraft = overOther != null && ElementRegistry.GetProducts(over.Element, overOther.Element).Length > 0;
-
-                    GL.BindTexture(TextureTarget.Texture2D, 0);
-
-                    GL.Translate(entity.X, entity.Y, 0);
-                    GL.Scale(ElementEntity.ElementIconSize, ElementEntity.ElementIconSize, 1);
-
-                    if (isOtherEntity)
-                    {
-                        if (canCraft)
-                            GL.Color3(0f, 1, 0.5f);
-                        else
-                            GL.Color3(1f, 0, 0.25f);
-                    }
-                    else
-                    {
-                        GL.Color3(0f, 0.5f, 1);
-                    }
-
-                    GL.Begin(PrimitiveType.LineLoop);
-                    VertexUtil.PutCircle();
-                    GL.End();
-
-                    if (isOtherEntity && _holding != null)
-                    {
-                        if (canCraft)
-                            GL.Color4(0f, 1, 0.5f, 0.15f);
-                        else
-                            GL.Color4(1f, 0, 0.25f, 0.15f);
-                    }
-                    else
-                    {
-                        GL.Color4(0f, 0.5f, 1, _holding == entity ? 0.35f : 0.15f);
-                    }
-
-                    GL.Begin(PrimitiveType.Polygon);
-                    VertexUtil.PutCircle();
-                    GL.End();
-
-                    GL.Scale(1f / ElementEntity.ElementIconSize, 1f / ElementEntity.ElementIconSize, 1);
-                    GL.Translate(-entity.X, -entity.Y, 0);
-                }
-
-                entity.Render(partialTicks);
+                entity?.Render(partialTicks);
             }
 
             if (_toastQueue.Count > 0)
@@ -183,24 +147,10 @@ namespace Alchemy
             _updateTimer.Restart();
         }
 
-        protected override void OnResize(EventArgs e)
-        {
-            GL.Viewport(0, 0, Width, Height);
-            GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadIdentity();
-            GL.Ortho(0, Width, Height, 0, 0, 1);
-
-            OnRenderFrame(null);
-        }
-
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             if (e.Button != MouseButton.Left || _holding != null || !ClientRectangle.Contains(e.Position))
                 return;
-
-            _mouseLast = e.Position;
-
-            //TODO - doesnt spawn base items after clicking an item
 
             //double click, clone double clicked item
             if (_clicks >= 1)
@@ -280,15 +230,26 @@ namespace Alchemy
             if (!ClientRectangle.Contains(e.Position))
                 return;
 
-            _clicks = 0;
-
             if (_holding != null)
             {
                 _holding.X = _clickOffset.X + e.X;
                 _holding.Y = _clickOffset.Y + e.Y;
             }
+        }
 
-            _mouseLast = e.Position;
+        protected override void OnResize(EventArgs e)
+        {
+            GL.Viewport(0, 0, Width, Height);
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(0, Width, Height, 0, 0, 1);
+
+            OnRenderFrame(null);
+        }
+
+        protected override void OnMove(EventArgs e)
+        {
+            OnRenderFrame(null);
         }
 
         protected void LearnElement(Element e)
@@ -297,7 +258,7 @@ namespace Alchemy
                 return;
 
             //TODO - call an event?
-            _toastQueue.Add(new AchievementToast("New element found!", e + "!", e.TextureID, this));
+            _toastQueue.Add(new AchievementToast("New element found!", e + "!", e.TextureId, this));
 
             _learntElements.Add(e);
         }
@@ -326,35 +287,35 @@ namespace Alchemy
         public string Title;
         public string MessageText;
 
-        private readonly int _iconTextureID;
-        private readonly int _toastTextureID;
+        private readonly int _iconTextureId;
+        private readonly int _toastTextureId;
 
         private readonly Game _game;
 
-        private long Ticks;
-        private long TicksLast;
+        private long _ticks;
+        private long _ticksLast;
 
-        private readonly long MaxTicks = 40;
+        private readonly long _maxTicks = 60;
 
         public bool IsDead;
 
-        public AchievementToast(string title, string messageText, int iconID, Game game)
+        public AchievementToast(string title, string messageText, int iconId, Game game)
         {
             Title = title;
             MessageText = messageText;
 
             _game = game;
 
-            _iconTextureID = iconID;
-            _toastTextureID = TextureManager.GetOrRegister("toast");
+            _iconTextureId = iconId;
+            _toastTextureId = TextureManager.GetOrRegister("toast");
         }
 
         public void Update()
         {
-            TicksLast = Ticks;
+            _ticksLast = _ticks;
 
-            if (Ticks < MaxTicks)
-                Ticks++;
+            if (_ticks < _maxTicks)
+                _ticks++;
             else
                 IsDead = true;
         }
@@ -366,10 +327,10 @@ namespace Alchemy
 
             float progress;
 
-            var partialTick = TicksLast + (Ticks - TicksLast) * partialTicks;
+            var partialTick = _ticksLast + (_ticks - _ticksLast) * partialTicks;
 
-            if (partialTick >= MaxTicks - 10)
-                progress = (float)Math.Cos(Math.Min(10 - MaxTicks - partialTick, 10) / 10f * MathHelper.PiOver2);
+            if (partialTick >= _maxTicks - 5)
+                progress = (float)Math.Cos(Math.Min(5 - _maxTicks - partialTick, 5) / 5f * MathHelper.PiOver2);
             else
                 progress = -(float)Math.Sin(Math.Min(partialTick, 10) / 10f * MathHelper.PiOver2);
 
@@ -379,7 +340,7 @@ namespace Alchemy
             GL.Translate(centerX, centerY, 0);
 
             //render toast texture
-            GL.BindTexture(TextureTarget.Texture2D, _toastTextureID);
+            GL.BindTexture(TextureTarget.Texture2D, _toastTextureId);
 
             GL.Color4(1f, 1, 1, 1);
             GL.Scale(256, 64, 1);
@@ -389,7 +350,7 @@ namespace Alchemy
             GL.Scale(1f / 256, 1f / 64, 1);
 
             //render icon shadow
-            GL.BindTexture(TextureTarget.Texture2D, _iconTextureID);
+            GL.BindTexture(TextureTarget.Texture2D, _iconTextureId);
 
             GL.Color4(0f, 0, 0, 1);
             GL.Translate(-94.5F, 2, 0);

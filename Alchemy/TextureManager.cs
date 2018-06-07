@@ -9,12 +9,12 @@ namespace Alchemy
 {
     internal static class TextureManager
     {
-        private static readonly Dictionary<string, int> _textures = new Dictionary<string, int>();
+        private static readonly Dictionary<string, int> Textures = new Dictionary<string, int>();
 
         public static int GetOrRegister(string textureName, Bitmap bmp = null)
         {
-            if (_textures.TryGetValue(textureName, out var texID))
-                return texID;
+            if (Textures.TryGetValue(textureName, out var texId))
+                return texId;
 
             Bitmap img = bmp;
 
@@ -34,18 +34,18 @@ namespace Alchemy
                 }
             }
 
-            var ID = LoadTexture(img);
+            var id = LoadTexture(img);
 
-            _textures.Add(textureName, ID);
+            Textures.Add(textureName, id);
 
-            return ID;
+            return id;
         }
 
         private static int LoadTexture(Bitmap img)
         {
-            var ID = GL.GenTexture();
+            var id = GL.GenTexture();
 
-            GL.BindTexture(TextureTarget.Texture2D, ID);
+            GL.BindTexture(TextureTarget.Texture2D, id);
 
             BitmapData data = img.LockBits(new Rectangle(0, 0, img.Width, img.Height),
                 ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
@@ -64,7 +64,7 @@ namespace Alchemy
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT,
                 (int)TextureWrapMode.ClampToEdge);
 
-            return ID;
+            return id;
         }
     }
 }

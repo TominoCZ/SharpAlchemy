@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Alchemy
 {
     public static class ElementRegistry
     {
-        private static readonly ConcurrentDictionary<Tuple<Element, Element>, Element[]> _combinations = new ConcurrentDictionary<Tuple<Element, Element>, Element[]>();
+        private static readonly ConcurrentDictionary<Tuple<Element, Element>, Element[]> Combinations = new ConcurrentDictionary<Tuple<Element, Element>, Element[]>();
 
-        private static readonly List<Element> _allElements = new List<Element>();
+        private static readonly List<Element> AllElements = new List<Element>();
 
         public static void RegisterCombination(Element e1, Element e2, params Element[] products)
         {
@@ -17,17 +18,17 @@ namespace Alchemy
 
             var combination = new Tuple<Element, Element>(e1, e2);
 
-            if (!_allElements.Contains(e1))
-                _allElements.Add(e1);
-            if (!_allElements.Contains(e2))
-                _allElements.Add(e2);
+            if (!AllElements.Contains(e1))
+                AllElements.Add(e1);
+            if (!AllElements.Contains(e2))
+                AllElements.Add(e2);
 
-            _combinations.TryAdd(combination, products);
+            Combinations.TryAdd(combination, products);
         }
 
         public static Element[] GetProducts(Element e1, Element e2)
         {
-            foreach (var pair in _combinations)
+            foreach (var pair in Combinations)
             {
                 var combination = pair.Key;
 
@@ -39,9 +40,14 @@ namespace Alchemy
             return new Element[0];
         }
 
+        public static Element GetElement(string name)
+        {
+            return AllElements.SingleOrDefault(element => element.ToString() == name);
+        }
+
         private static bool CombinationExists(Element e1, Element e2)
         {
-            foreach (var pair in _combinations)
+            foreach (var pair in Combinations)
             {
                 var combination = pair.Key;
 

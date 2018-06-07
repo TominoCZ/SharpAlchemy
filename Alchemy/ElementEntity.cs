@@ -41,7 +41,7 @@ namespace Alchemy
             GL.Translate(X, Y, 0);
             GL.Scale(ElementIconSize, ElementIconSize, 1);
 
-            GL.BindTexture(TextureTarget.Texture2D, Element.TextureID);
+            GL.BindTexture(TextureTarget.Texture2D, Element.TextureId);
 
             GL.Begin(PrimitiveType.Quads);
             GL.Color4(1f, 1, 1, progress);
