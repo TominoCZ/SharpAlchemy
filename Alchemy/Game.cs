@@ -21,6 +21,10 @@ namespace Alchemy
 
         private readonly Stopwatch _updateTimer = new Stopwatch();
 
+        private InventoryGui _inventoryGui;
+
+        private TrashEntity _trashEntity;
+
         private ElementEntity _holding;
         private ElementEntity _lastClicked;
         private PointF _clickOffset;
@@ -61,6 +65,9 @@ namespace Alchemy
             LoadElementsFromFile();
 
             AddBaseElements(new Point(Width / 2, Height / 2));
+
+            _trashEntity = new TrashEntity(this);
+            _inventoryGui = new InventoryGui(this);
         }
 
         private void LoadElementsFromFile()
@@ -104,7 +111,12 @@ namespace Alchemy
 
             foreach (var element in cej.Elements)
             {
-                ElementRegistry.RegisterElement(new Element(element.Name, element.TextureName, element.IsBaseElement));
+                var e = new Element(element.Name, element.TextureName, element.IsBaseElement);
+
+                ElementRegistry.RegisterElement(e);
+
+                if (element.IsBaseElement)
+                    _learntElements.Add(e);
             }
 
             foreach (var combination in cej.ElementCombinations)
@@ -144,18 +156,39 @@ namespace Alchemy
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
             var partialTicks = (float)(_updateTimer.Elapsed.TotalMilliseconds / (TargetUpdatePeriod * 1000f));
+
+            _trashEntity?.SetShown(_holding != null && _trashEntity.MouseOverDestination && !_inventoryGui.IsShown());
+            _trashEntity?.Render(partialTicks);
 
             for (var index = 0; index < _elementEntities.Count; index++)
             {
                 var entity = _elementEntities[index];
 
-                entity?.Render(partialTicks);
+                if (entity != _holding)
+                    entity?.Render(partialTicks);
             }
 
+            _holding?.Render(partialTicks);
+
+            var offsetY = 0f;
+
             if (_toastQueue.Count > 0)
-                _toastQueue.First()?.Render(partialTicks);
+            {
+                var toast = _toastQueue.First();
+
+                if (toast != null)
+                {
+                    toast.Render(partialTicks);
+                    offsetY = toast.CurrentY;
+                }
+            }
+
+            var baseCount = ElementRegistry.GetBaseElements().Length;
+            FontRenderer.DrawTextCentered(Width / 2f, 16 - offsetY, $"DISCOVERED {_learntElements.Count - baseCount}/{ElementRegistry.GetTotalCount() - baseCount}");
+
+            _inventoryGui?.SetShown(_holding == null && (_inventoryGui.MouseOverTrigger || _inventoryGui.IsShown() && _inventoryGui.MouseOverRectangle));
+            _inventoryGui?.Render(partialTicks);
 
             SwapBuffers();
         }
@@ -168,6 +201,9 @@ namespace Alchemy
 
                 entity.Update();
             }
+
+            _inventoryGui?.Update();
+            _trashEntity?.Update();
 
             if (_toastQueue.Count > 0)
             {
@@ -188,6 +224,21 @@ namespace Alchemy
         {
             if (e.Button != MouseButton.Left || _holding != null || !ClientRectangle.Contains(e.Position))
                 return;
+
+            if (_inventoryGui != null && _inventoryGui.IsShown())
+            {
+                var picked = _inventoryGui.PickElement(e.X, e.Y);
+
+                if (picked != null)
+                {
+                    _holding = new ElementEntity(e.X, e.Y, picked);
+                    _clickOffset = new PointF();
+
+                    _elementEntities.Add(_holding);
+                }
+
+                return;
+            }
 
             //double click, clone double clicked item
             if (_clicks >= 1)
@@ -232,8 +283,20 @@ namespace Alchemy
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
-            if (e.Button != MouseButton.Left || _holding == null || !ClientRectangle.Contains(e.Position))
+            var btnDown = e.Button == MouseButton.Left;
+
+            if (!ClientRectangle.Contains(e.Position) && !btnDown)
+            {
+                _holding = null;
                 return;
+            }
+            if (!btnDown || _holding == null)
+                return;
+
+            if (_trashEntity != null && _trashEntity.MouseOver)
+            {
+                _elementEntities.Remove(_holding);
+            }
 
             if (GetTopElementAtPoint(new PointF(_holding.X, _holding.Y), _holding) is ElementEntity ee)
             {
@@ -259,31 +322,38 @@ namespace Alchemy
 
                     SpawnElementEntity(middleX, middleY, product);
                 }
+
+                if (products.Length > 0)
+                {
+                    if (_learntElements.Count == ElementRegistry.GetTotalCount())
+                    {
+                        _toastQueue.Add(new AchievementToast("That's it!", "You know everything!", TextureManager.GetOrRegister("obsidian"), this));
+                    }
+                }
             }
 
             _holding = null;
-            _clickOffset = new PointF();
         }
 
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
             if (!ClientRectangle.Contains(e.Position))
-            {
-                _holding = null;
-                _clickOffset = new PointF();
-
                 return;
-            }
 
             if (_holding != null)
             {
                 _holding.X = _clickOffset.X + e.X;
                 _holding.Y = _clickOffset.Y + e.Y;
             }
+
+            _inventoryGui?.MouseMove(e.X, e.Y);
+            _trashEntity?.MouseMove(e.X, e.Y);
         }
 
         protected override void OnResize(EventArgs e)
         {
+            ClientSize = new Size(Math.Max(Width, 640), Math.Max(Height, 480));
+
             GL.Viewport(0, 0, Width, Height);
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
@@ -297,6 +367,11 @@ namespace Alchemy
             OnRenderFrame(null);
         }
 
+        public List<Element> GetLearntElements()
+        {
+            return _learntElements;
+        }
+
         protected void LearnElement(Element e)
         {
             if (_learntElements.Contains(e))
@@ -308,7 +383,7 @@ namespace Alchemy
             _learntElements.Add(e);
         }
 
-        public void SpawnElementEntity(float x, float y, Element e)
+        private void SpawnElementEntity(float x, float y, Element e)
         {
             _elementEntities.Add(new ElementEntity(x, y, e));
         }

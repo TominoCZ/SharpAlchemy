@@ -19,6 +19,8 @@ namespace Alchemy
 
         private readonly long _maxTicks = 60;
 
+        public float CurrentY;
+
         public bool IsDead;
 
         public AchievementToast(string title, string messageText, int iconId, Game game)
@@ -57,7 +59,7 @@ namespace Alchemy
                 progress = -(float)Math.Sin(Math.Min(partialTick, 10) / 10f * MathHelper.PiOver2);
 
             var centerX = _game.Width / 2;
-            var centerY = -32 - 64 * progress;
+            var centerY = -32 - (CurrentY = 64 * progress);
 
             GL.Translate(centerX, centerY, 0);
 

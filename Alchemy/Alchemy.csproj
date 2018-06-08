@@ -64,9 +64,11 @@
     <Compile Include="ElementRegistry.cs" />
     <Compile Include="FontRenderer.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="InventoryGui.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextureManager.cs" />
+    <Compile Include="TrashEntity.cs" />
     <Compile Include="VertexUtil.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

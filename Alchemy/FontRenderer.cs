@@ -54,7 +54,6 @@ namespace Alchemy
             var tex = TextureManager.GetOrRegister("font");
 
             GL.BindTexture(TextureTarget.Texture2D, tex);
-
             GL.Begin(PrimitiveType.Quads);
 
             float uStep = GlyphWidth / (float)_textureWidth;
@@ -101,14 +100,14 @@ namespace Alchemy
                 {
                     if (BitmapFont)
                     {
-                        g.SmoothingMode = SmoothingMode.None;
+                        g.SmoothingMode = SmoothingMode.HighQuality;
                         g.TextRenderingHint = TextRenderingHint.SingleBitPerPixel;
                     }
                     else
                     {
                         g.SmoothingMode = SmoothingMode.HighQuality;
                         g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-                        g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                        //g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                     }
 
                     for (int p = 0; p < GlyphLineCount; p++)

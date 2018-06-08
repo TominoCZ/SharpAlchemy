@@ -5,16 +5,30 @@ namespace Alchemy
 {
     internal static class VertexUtil
     {
-        public static void PutQuad()
+        public static void PutQuad(bool centered = true)
         {
+            if (centered)
+            {
+                GL.TexCoord2(0, 0);
+                GL.Vertex2(-0.5, -0.5);
+                GL.TexCoord2(0, 1);
+                GL.Vertex2(-0.5, 0.5);
+                GL.TexCoord2(1, 1);
+                GL.Vertex2(0.5, 0.5);
+                GL.TexCoord2(1, 0);
+                GL.Vertex2(0.5, -0.5);
+
+                return;
+            }
+
             GL.TexCoord2(0, 0);
-            GL.Vertex2(-0.5, -0.5);
+            GL.Vertex2(0, 0);
             GL.TexCoord2(0, 1);
-            GL.Vertex2(-0.5, 0.5);
+            GL.Vertex2(0, 1);
             GL.TexCoord2(1, 1);
-            GL.Vertex2(0.5, 0.5);
+            GL.Vertex2(1, 1);
             GL.TexCoord2(1, 0);
-            GL.Vertex2(0.5, -0.5);
+            GL.Vertex2(1, 0);
         }
 
         public static void PutCircle()

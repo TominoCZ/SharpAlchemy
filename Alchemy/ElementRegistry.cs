@@ -32,6 +32,11 @@ namespace Alchemy
             Combinations.TryAdd(combination, products);
         }
 
+        public static int GetTotalCount()
+        {
+            return AllElements.Count;
+        }
+
         public static Element[] GetBaseElements()
         {
             return AllElements.Where(e => e.IsBaseElement).ToArray();

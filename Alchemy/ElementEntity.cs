@@ -51,7 +51,7 @@ namespace Alchemy
             GL.Scale(1f / ElementIconSize, 1f / ElementIconSize, 1);
             GL.Translate(-X, -Y, 0);
 
-            FontRenderer.DrawTextCentered(X, Y + ElementIconSize / 1.5f, Element.ToString());
+            FontRenderer.DrawTextCentered(X, Y + ElementIconSize / 1.5f + 5, Element.ToString());
         }
 
         public bool IsMouseOver(PointF p)
@@ -61,7 +61,7 @@ namespace Alchemy
 
             var dist = Math.Sqrt(x * x + y * y);
 
-            return dist <= ElementIconSize / 2f;
+            return dist <= ElementIconSize;
         }
     }
 }
