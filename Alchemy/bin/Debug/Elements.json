@@ -51,8 +51,48 @@
       "IsBaseElement": false
     },
     {
+      "Name": "Stone",
+      "TextureName": "stone",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Clay",
+      "TextureName": "clay",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Brick",
+      "TextureName": "brick",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Pottery",
+      "TextureName": "pottery",
+      "IsBaseElement": false
+    },
+    {
       "Name": "Lava",
       "TextureName": "lava",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Aquarium",
+      "TextureName": "aquarium",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Rain",
+      "TextureName": "rain",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Plant",
+      "TextureName": "plant",
+      "IsBaseElement": false
+    },
+    {
+      "Name": "Tree",
+      "TextureName": "tree",
       "IsBaseElement": false
     }
   ],
@@ -61,7 +101,7 @@
       "Element1": "Fire",
       "Element2": "Earth",
       "Products": [
-        "Lava"
+		"Lava"
       ]
     },
     {
@@ -90,7 +130,36 @@
       "Element1": "Water",
       "Element2": "Lava",
       "Products": [
-        "Obsidian"
+        "Stone"
+      ]
+    },
+    {
+      "Element1": "Water",
+      "Element2": "Air",
+      "Products": [
+        "Rain"
+      ]
+    },
+    {
+      "Element1": "Water",
+      "Element2": "Stone",
+      "Products": [
+        "Sand"
+      ]
+    },
+	{
+      "Element1": "Sand",
+      "Element2": "Mud",
+      "Products": [
+        "Clay"
+      ]
+    },
+	{
+      "Element1": "Fire",
+      "Element2": "Clay",
+      "Products": [
+        "Pottery",
+		"Brick"
       ]
     },
     {
@@ -105,6 +174,27 @@
       "Element2": "Dust",
       "Products": [
         "Sand"
+      ]
+    },
+    {
+      "Element1": "Water",
+      "Element2": "Glass",
+      "Products": [
+        "Aquarium"
+      ]
+    },
+    {
+      "Element1": "Rain",
+      "Element2": "Earth",
+      "Products": [
+        "Plant"
+      ]
+    },
+    {
+      "Element1": "Rain",
+      "Element2": "Plant",
+      "Products": [
+        "Tree"
       ]
     }
   ]

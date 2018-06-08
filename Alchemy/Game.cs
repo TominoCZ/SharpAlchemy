@@ -298,7 +298,7 @@ namespace Alchemy
                 return;
 
             //TODO - call an event?
-            _toastQueue.Add(new AchievementToast("New element found!", e + "!", e.TextureId, this));
+            _toastQueue.Add(new AchievementToast("New object found!", e + "!", e.TextureId, this));
 
             _learntElements.Add(e);
         }
