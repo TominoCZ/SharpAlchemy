@@ -94,6 +94,11 @@
       "Name": "Tree",
       "TextureName": "tree",
       "IsBaseElement": false
+    },
+    {
+      "Name": "Wall",
+      "TextureName": "wall",
+      "IsBaseElement": false
     }
   ],
   "ElementCombinations": [
@@ -128,6 +133,13 @@
     },
     {
       "Element1": "Water",
+      "Element2": "Lava",
+      "Products": [
+        "Obsidian"
+      ]
+    },
+    {
+      "Element1": "Air",
       "Element2": "Lava",
       "Products": [
         "Stone"
@@ -195,6 +207,13 @@
       "Element2": "Plant",
       "Products": [
         "Tree"
+      ]
+    },
+    {
+      "Element1": "Brick",
+      "Element2": "Brick",
+      "Products": [
+        "Wall"
       ]
     }
   ]

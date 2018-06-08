@@ -108,7 +108,7 @@ namespace Alchemy
                     {
                         g.SmoothingMode = SmoothingMode.HighQuality;
                         g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-                        //g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                        g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                     }
 
                     for (int p = 0; p < GlyphLineCount; p++)

@@ -268,7 +268,12 @@ namespace Alchemy
         protected override void OnMouseMove(MouseMoveEventArgs e)
         {
             if (!ClientRectangle.Contains(e.Position))
+            {
+                _holding = null;
+                _clickOffset = new PointF();
+
                 return;
+            }
 
             if (_holding != null)
             {
